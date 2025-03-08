@@ -1,0 +1,35 @@
+# Ignore node modules (except inside the container)
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Ignore local environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore build outputs
+.next
+out
+dist
+
+# Ignore logs
+logs
+*.log
+yarn.lock
+package-lock.json
+
+# Ignore editor-specific files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Ignore Docker-related files
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.dev.yml
