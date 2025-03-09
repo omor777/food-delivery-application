@@ -1,7 +1,7 @@
 import mongoose, { Schema, models, model } from "mongoose";
 import bcrypt from "bcryptjs";
 
-export enum Role {
+export enum UserRole {
   CUSTOMER = "customer",
   RESTAURANT = "restaurant",
   DELIVERY = "delivery",
@@ -11,7 +11,7 @@ export interface IUser {
   _id?: mongoose.Types.ObjectId;
   email: string;
   password: string;
-  role: Role;
+  role: UserRole;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -38,9 +38,9 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: Object.values(Role),
+      enum: Object.values(UserRole),
       required: true,
-      default: Role.CUSTOMER,
+      default: UserRole.CUSTOMER,
     },
   },
   {
@@ -48,7 +48,6 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
