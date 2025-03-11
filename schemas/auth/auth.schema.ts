@@ -1,7 +1,7 @@
 import { UserRole } from "@/models/user.model";
 import { z } from "zod";
 
-export const userSchema = z.object({
+export const registerSchema = z.object({
   email: z.string().toLowerCase().trim().email({
     message: "Invalid email address",
   }),

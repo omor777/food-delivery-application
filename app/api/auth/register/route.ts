@@ -1,14 +1,15 @@
-import dbConnect from "@/lib/db";
-import User from "@/models/user.model";
-import { userSchema } from "@/schemas/user.schema";
-import { formatZodErrors } from "@/utils/userInputValidation";
 import { NextRequest, NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
+import { registerSchema } from "@/schemas/auth/auth.schema";
+import { formatZodErrors } from "@/utils/userInputValidation";
+import dbConnect from "@/lib/db";
+import User from "@/models/user.model";
 
 export async function POST(req: NextRequest) {
   await dbConnect();
   try {
+    // Check if content type is application/json
     if (req.headers.get("content-type") !== "application/json") {
       return NextResponse.json(
         { error: "Invalid content type" },
@@ -18,7 +19,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const validation = userSchema.safeParse(body);
+    // Validate user input
+    const validation = registerSchema.safeParse(body);
     if (!validation.success) {
       const errors = formatZodErrors(validation.error);
       return NextResponse.json(
@@ -27,6 +29,7 @@ export async function POST(req: NextRequest) {
       );
     }
     // Check if email already exists
+
     const existingUser = await User.findOne({ email: validation.data.email });
     if (existingUser) {
       return NextResponse.json(
@@ -34,7 +37,7 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-
+    // Hash password
     validation.data.password = await bcrypt.hash(validation.data.password, 10);
 
     const newUser = await User.create(validation.data);
