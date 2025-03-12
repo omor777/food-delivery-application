@@ -5,6 +5,7 @@ import { registerSchema } from "@/schemas/auth/auth.schema";
 import { formatZodErrors } from "@/utils/userInputValidation";
 import dbConnect from "@/lib/db";
 import User from "@/models/user.model";
+import { Address } from "@/models/address.model";
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -41,6 +42,12 @@ export async function POST(req: NextRequest) {
     validation.data.password = await bcrypt.hash(validation.data.password, 10);
 
     const newUser = await User.create(validation.data);
+
+    // creating address document
+    const address = new Address({
+      user: newUser._id,
+    });
+    await address.save();
 
     const data = {
       success: true,
