@@ -51,13 +51,14 @@ const addressSchema = new Schema<IAddress>(
       required: true,
     },
     location: {
-      type: "Point",
+      type: String,
+      enum: ["Point"],
       coordinates: [Number, Number],
     },
-    
   },
   { timestamps: true }
 );
 
-export const Address =
-  models.Address || model<IAddress>("Address", addressSchema);
+const Address = models.Address || model<IAddress>("Address", addressSchema);
+
+export default Address;

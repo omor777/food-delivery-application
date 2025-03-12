@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/schemas/auth/auth.schema";
 import { formatZodErrors } from "@/utils/userInputValidation";
 import dbConnect from "@/lib/db";
 import User from "@/models/user.model";
-import { Address } from "@/models/address.model";
+import Address from "@/models/address.model";
+import Profile from "@/models/profile.model";
 
 export async function POST(req: NextRequest) {
   await dbConnect();
+  // Start a new session
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     // Check if content type is application/json
     if (req.headers.get("content-type") !== "application/json") {
@@ -29,8 +34,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    // Check if email already exists
 
+    // Check if email already exists
     const existingUser = await User.findOne({ email: validation.data.email });
     if (existingUser) {
       return NextResponse.json(
@@ -38,17 +43,27 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+
     // Hash password
     validation.data.password = await bcrypt.hash(validation.data.password, 10);
 
     const newUser = await User.create(validation.data);
-
-    // creating address document
     const address = new Address({
       user: newUser._id,
     });
-    await address.save();
 
+    const profile = new Profile({
+      user: newUser._id,
+    });
+
+    await address.save();
+    await profile.save();
+
+    // commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Send success response
     const data = {
       success: true,
       message: "User registered successfully",
