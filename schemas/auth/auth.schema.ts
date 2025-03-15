@@ -27,3 +27,20 @@ export const registerSchema = z.object({
     message: "User role should be customer, restaurant, delivery or admin",
   }),
 });
+
+export const signInSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .toLowerCase()
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid Email"),
+  password: z.string({
+    required_error: "Password is required",
+  }),
+});
+
+export type RegisterSchema = z.infer<typeof registerSchema>;
+export type LoginSchema = z.infer<typeof signInSchema>;

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-import bcrypt from "bcryptjs";
 import { registerSchema } from "@/schemas/auth/auth.schema";
 import { formatZodErrors } from "@/utils/userInputValidation";
 import dbConnect from "@/lib/db";
@@ -43,9 +42,6 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-
-    // Hash password
-    validation.data.password = await bcrypt.hash(validation.data.password, 10);
 
     const newUser = await User.create(validation.data);
     const address = new Address({

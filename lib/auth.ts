@@ -1,9 +1,7 @@
+import User from "@/models/user.model";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
 import bcrypt from "bcryptjs";
-
-import User from "@/models/user.model";
 import dbConnect from "./db";
 
 export const authOptions: NextAuthOptions = {
@@ -11,79 +9,70 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "Email",
-        },
+        email: { label: "email", type: "text", placeholder: "email" },
         password: {
-          label: "Password",
+          label: "password",
           type: "password",
-          placeholder: "Password",
+          placeholder: "password",
         },
       },
-
       async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        await dbConnect();
+
+        const user = await User.findOne({
+          email: credentials?.email,
+        });
+
         try {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error("Invalid credentials");
-          }
-
-          await dbConnect();
-
-          const user = await User.findOne({ email: credentials.email });
-
-          if (!user) {
+          if (!!user) {
+            const isMatch = await bcrypt.compare(
+              credentials?.password,
+              user.password
+            );
+            if (isMatch) {
+              return {
+                id: user._id.toString(),
+                email: user.email,
+                role: user.role,
+              };
+            } else {
+              throw new Error("Invalid credentials");
+            }
+          } else {
             throw new Error("User not found");
           }
-
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-
-          if (!isPasswordValid) {
-            throw new Error("Invalid password");
-          }
-
-          return {
-            id: user._id.toString(),
-            email: user.email,
-            role: user.role,
-          };
         } catch (error) {
           console.error("Auth error:", error);
-          throw error;
+          throw new Error("Invalid credentials");
         }
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
         token.role = user.role;
+        console.log("jwt user: ", user);
       }
+      console.log("jwt token: ", token);
+
       return token;
     },
 
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.email = token.email;
         session.user.role = token.role;
       }
+      console.log("session token:", token);
+      console.log("session: ", session);
       return session;
     },
   },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-  secret: process.env.NEXTAUTH_SECRET,
 };
