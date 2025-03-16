@@ -1,10 +1,10 @@
-import mongoose, { model, Schema, models } from "mongoose";
+import mongoose, { model, Schema, models, Document } from "mongoose";
 
 type Location = {
   type?: "Point";
   coordinates?: [number, number];
 };
-export interface IAddress extends mongoose.Document {
+export interface IAddress extends Document {
   _id: mongoose.Types.ObjectId;
   addressLine1?: string;
   addressLine2?: string;
@@ -24,6 +24,8 @@ const addressSchema = new Schema<IAddress>(
   {
     addressLine1: {
       type: String,
+      required: false,
+      default: "",
     },
     addressLine2: {
       type: String,
@@ -59,6 +61,6 @@ const addressSchema = new Schema<IAddress>(
   { timestamps: true }
 );
 
-const Address = models.Address || model<IAddress>("Address", addressSchema);
+const Address = models.Address ?? model<IAddress>("Address", addressSchema);
 
 export default Address;

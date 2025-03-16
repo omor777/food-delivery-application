@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-type ValidationError = {
+export type ValidationError = {
   field: string;
   message: string;
 };

@@ -1,4 +1,4 @@
-import mongoose, { Schema, models, model } from "mongoose";
+import mongoose, { Schema, models, model, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export enum UserRole {
@@ -7,8 +7,8 @@ export enum UserRole {
   DELIVERY = "delivery",
   ADMIN = "admin",
 }
-export interface IUser {
-  _id?: mongoose.Types.ObjectId;
+export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
   email: string;
   password: string;
   role: UserRole;
@@ -47,7 +47,6 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
   }
 );
-
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {

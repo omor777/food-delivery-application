@@ -4,6 +4,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "./db";
 
+import type {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
+import { getServerSession } from "next-auth";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -58,9 +65,9 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        console.log("jwt user: ", user);
+        // console.log("jwt user: ", user);
       }
-      console.log("jwt token: ", token);
+      // console.log("jwt token: ", token);
 
       return token;
     },
@@ -70,9 +77,26 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.role = token.role;
       }
-      console.log("session token:", token);
-      console.log("session: ", session);
+      // console.log("session token:", token);
+      // console.log("session: ", session);
       return session;
     },
   },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET!,
 };
+
+export function getSession(
+  ...args:
+    | [GetServerSidePropsContext["req"], GetServerSidePropsContext["res"]]
+    | [NextApiRequest, NextApiResponse]
+    | []
+) {
+  return getServerSession(...args, authOptions);
+}
