@@ -12,3 +12,7 @@ export const createRestaurant = async (
 
   return (await restaurant.save()).toObject();
 };
+
+export const findRestaurantById = async (id: string) => {
+  return await Restaurant.findOne({ owner: id }).lean();
+};
