@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { z } from "zod";
 
 export const createRestaurantSchema = z.object({
@@ -11,19 +10,10 @@ export const createRestaurantSchema = z.object({
       required_error: "Email is required",
       invalid_type_error: "Email must be a string",
     })
+    .trim()
+    .toLowerCase()
     .email("Invalid email address"),
-  owner: z
-    .string({
-      required_error: "Owner is required",
-    })
-    .refine(
-      (val) => {
-        return mongoose.Types.ObjectId.isValid(val);
-      },
-      {
-        message: "Invalid MongoDB ObjectId format",
-      }
-    ),
+
   cuisineType: z.string({
     required_error: "Cuisine type is required",
     invalid_type_error: "Cuisine type must be a string",
@@ -43,15 +33,19 @@ export const createRestaurantSchema = z.object({
   }),
 
   openingHours: z.object({
-    open: z.string({
-      required_error: "Opening hours are required",
-      invalid_type_error: "Opening hours must be a string",
-    }),
-    close: z.string({
-      required_error: "Closing hours are required",
-      invalid_type_error: "Closing hours must be a string",
-    }),
+    open: z
+      .string({
+        required_error: "Opening hours are required",
+        invalid_type_error: "Opening hours must be a string",
+      })
+      .toUpperCase(),
+    close: z
+      .string({
+        required_error: "Closing hours are required",
+        invalid_type_error: "Closing hours must be a string",
+      })
+      .toUpperCase(),
   }),
 });
 
-
+export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;

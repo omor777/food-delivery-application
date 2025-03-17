@@ -25,31 +25,33 @@ const restaurantSchema = new Schema<IRestaurant>(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Name is required"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
+      trim: true,
+      lowercase: true,
     },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "Owner is required"],
     },
     cuisineType: {
       type: String,
-      required: true,
+      required: [true, "Cuisine type is required"],
     },
     addressLine1: {
       type: String,
-      required: true,
+      required: [true, "Address line 1 is required"],
     },
     addressLine2: {
       type: String,
     },
     contactNumber: {
       type: String,
-      required: true,
+      required: [true, "Contact number is required"],
     },
     rating: {
       type: Number,
@@ -62,11 +64,11 @@ const restaurantSchema = new Schema<IRestaurant>(
     openingHours: {
       open: {
         type: String,
-        required: true,
+        required: [true, "Opening hours are required"],
       },
       close: {
         type: String,
-        required: true,
+        required: [true, "Closing hours are required"],
       },
     },
     status: {
