@@ -1,7 +1,7 @@
-import { models, model, Schema, Document, Types } from "mongoose";
+import { models, model, Schema, Types } from "mongoose";
 
-export interface IRestaurant extends Document {
-  _id: Types.ObjectId;
+export interface IRestaurant {
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   owner: Types.ObjectId;

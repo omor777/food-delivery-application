@@ -48,4 +48,30 @@ export const createRestaurantSchema = z.object({
   }),
 });
 
+export const restaurantQuerySchema = z.object({
+  page: z
+    .string({
+      invalid_type_error: "Page number must be a number",
+    })
+    .default("1")
+    .transform(Number)
+    .refine((val) => Number.isInteger(val) && val > 0, {
+      message: "Page number must be a positive integer",
+    }),
+  limit: z
+    .string({
+      invalid_type_error: "Limit must be a number",
+    })
+    .default("10")
+    .transform(Number)
+    .refine((val) => Number.isInteger(val) && val > 0 && val <= 100, {
+      message: "Limit must be a positive integer between 1 and 100",
+    }),
+  status: z.enum(["pending", "approved", "rejected"]).optional(),
+  sortBy: z.enum(["createdAt", "name", "status"]).default("createdAt"),
+  sortType: z.enum(["asc", "desc"]).default("asc"),
+});
+
+export type RestaurantQuery = z.infer<typeof restaurantQuerySchema>;
+
 export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
