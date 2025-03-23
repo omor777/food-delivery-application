@@ -48,6 +48,52 @@ export const createRestaurantSchema = z.object({
   }),
 });
 
+export const updateRestaurantSchema = z.object({
+  name: z
+    .string({
+      invalid_type_error: "Name must be a string",
+    })
+    .min(3, "Name must be at least 3 characters long")
+    .optional(),
+  cuisineType: z
+    .string({
+      invalid_type_error: "Cuisine type must be a string",
+    })
+    .optional(),
+  addressLine1: z
+    .string({
+      invalid_type_error: "Address line 1 must be a string",
+    })
+    .optional(),
+  addressLine2: z
+    .string({
+      invalid_type_error: "Address line 2 must be a string",
+    })
+    .optional(),
+  contactNumber: z
+    .string({
+      required_error: "Contact number is required",
+      invalid_type_error: "Contact number must be a string",
+    })
+    .optional(),
+  openingHours: z
+    .object({
+      open: z
+        .string({
+          invalid_type_error: "Opening hours must be a string",
+        })
+        .toUpperCase()
+        .optional(),
+      close: z
+        .string({
+          invalid_type_error: "Closing hours must be a string",
+        })
+        .toUpperCase()
+        .optional(),
+    })
+    .optional(),
+});
+
 export const restaurantQuerySchema = z.object({
   page: z
     .string({
